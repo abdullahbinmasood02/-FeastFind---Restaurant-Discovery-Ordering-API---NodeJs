@@ -69,9 +69,8 @@ userSchema.pre("save", function (next) {
 });
 
 //filter out inactive users
-userSchema.pre(/^find/, function (next) {
-  this.where({ isActive: { $ne: false } });
-  next();
+userSchema.pre(/^find/, function () {
+  this.where({ active: { $ne: false } });
 });
 
 //instance methods
@@ -94,4 +93,4 @@ userSchema.methods.generatePasswordResetToken = function () {
 };
 
 const userModel = mongoose.model("users", userSchema);
-module.exports = userModels;
+module.exports = userModel;

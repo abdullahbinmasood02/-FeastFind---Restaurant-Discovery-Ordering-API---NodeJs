@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { trim } = require("validator");
 const slugify = require("slugify");
+const userModel = require("./user");
 
 const restaurantSchema = mongoose.Schema(
   {
@@ -38,7 +39,7 @@ const restaurantSchema = mongoose.Schema(
       description: String,
     },
     phone: {
-      type: Number,
+      type: String,
       required: [true, "please enter restaurant phone number"],
     },
     ratingsAverage: {
@@ -99,12 +100,11 @@ const restaurantSchema = mongoose.Schema(
   },
 );
 
-restaurantSchema.pre("save", function (next) {
+restaurantSchema.pre("save", function () {
   if (!this.isNew) return next();
 
   const slug = slugify(this.name);
   this.slug = slug;
-  next();
 });
 
 restaurantSchema.pre(/^find/, function (next) {
@@ -118,7 +118,7 @@ restaurantSchema.pre(/^find/, function (next) {
   });
 });
 
-restaurantSchema.virtuals("reviews", {
+restaurantSchema.virtual("reviews", {
   ref: "reviews",
   foreignField: "restaurant",
   localField: "_id",
