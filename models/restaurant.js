@@ -7,10 +7,11 @@ const restaurantSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      min: 3,
-      max: 50,
+      minlength: [3, "restaurant name cannot be less than 3 characters"],
+      maxlength: [50, "restaurant name cannot be more than 50 characters"],
       trim: true,
       required: [true, "please enter restaurant name"],
+      unique: true,
     },
     slug: String,
     cuisine: {
@@ -31,6 +32,7 @@ const restaurantSchema = mongoose.Schema(
       type: String,
       required: [true, "please enter restaurant address"],
       trim: true,
+      unique: true,
     },
     location: {
       type: { type: "String", default: "Point", enum: ["Point"] },
