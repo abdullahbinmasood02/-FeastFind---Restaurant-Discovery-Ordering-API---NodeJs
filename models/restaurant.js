@@ -108,7 +108,8 @@ restaurantSchema.pre("save", function () {
 });
 
 restaurantSchema.pre(/^find/, function (next) {
-  this.where({ isVerified: { $ne: false } });
+  if (this.op === "find" || this.op === "findOne")
+    this.where({ isVerified: { $ne: false } });
 });
 
 restaurantSchema.pre(/^find/, function (next) {
