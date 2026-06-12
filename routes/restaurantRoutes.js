@@ -1,4 +1,4 @@
-const restaurantController = require("../controllers/restaurant");
+const restaurantController = require("../controllers/restaurantController");
 const express = require("express");
 const restaurantRouter = express.Router();
 

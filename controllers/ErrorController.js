@@ -48,7 +48,7 @@ function sendErrorProd(err, res) {
 
 function globalErrorController(err, req, res, next) {
   err.status = err.status || "error";
-  err.statusCode = err.statusCode || "500";
+  err.statusCode = err.statusCode || 500;
   let error = "";
 
   if (process.env.NODE_ENV === "dev") {

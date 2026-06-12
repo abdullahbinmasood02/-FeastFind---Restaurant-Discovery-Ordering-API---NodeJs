@@ -41,5 +41,12 @@ const menuItemSchema = mongoose.Schema({
   preparationTime: Number,
 });
 
-const menuModel = mongoose.model("menuItems", menuItemSchema);
+menuItemSchema.pre(/^find/, function () {
+  this.populate({
+    path: "restaurant",
+    select: "name",
+  });
+});
+
+const menuModel = mongoose.model("menuItems", menuItemSchema, "menuItems");
 module.exports = menuModel;

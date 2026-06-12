@@ -25,7 +25,7 @@ class ApiFeatures {
     let sortStr = "";
     if (this.queryObj.sort) {
       sortStr = this.queryObj.sort.split(",").join(" ");
-    }
+    } else sortStr = "name";
     this.query = this.query.sort(sortStr);
     return this;
   }
@@ -39,13 +39,9 @@ class ApiFeatures {
     return this;
   }
   getPages() {
-    let pages = 0;
-    let limit = 0;
+    let pages = this.queryObj.pages || 1;
+    let limit = this.queryObj.limit || 100;
 
-    if (this.queryObj?.pages > 0 && this.queryObj.limit) {
-      pages = this.queryObj.pages;
-      limit = this.queryObj.limit;
-    }
     const toSkip = (pages - 1) * limit;
     this.query = this.query.skip(toSkip).limit(limit);
     return this;

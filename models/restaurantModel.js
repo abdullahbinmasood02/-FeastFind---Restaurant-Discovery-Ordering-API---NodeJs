@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { trim } = require("validator");
 const slugify = require("slugify");
-const userModel = require("./user");
+const userModel = require("./userModel");
 
 const restaurantSchema = mongoose.Schema(
   {
@@ -114,7 +114,7 @@ restaurantSchema.pre(/^find/, function (next) {
     this.where({ isVerified: { $ne: false } });
 });
 
-restaurantSchema.pre(/^find/, function (next) {
+restaurantSchema.pre(/^find/, function () {
   this.populate({
     path: "owner",
     select: "name",

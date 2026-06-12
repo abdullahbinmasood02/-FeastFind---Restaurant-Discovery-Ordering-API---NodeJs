@@ -5,10 +5,12 @@ const ApiFeatures = require("../utils/ApiFeatures");
 exports.getAll = (model) => {
   return catchAsync(async (req, res, next) => {
     let query = model.find();
+
     const apiFeatures = new ApiFeatures(req.query, query);
 
     const result = await apiFeatures.filter().sort().getFields().getPages()
       .query;
+
     res.status(200).json({
       status: "success",
       data: {
@@ -21,6 +23,8 @@ exports.getAll = (model) => {
 exports.deleteOne = (model) => {
   return catchAsync(async (req, res, next) => {
     const deleted = await model.findByIdAndDelete(req.params.id);
+
+    if (!deleted) return next(new AppError("No such document exists", 404));
 
     res.status(201).json({
       status: "success",
@@ -35,6 +39,8 @@ exports.update = (model) => {
       runValidators: true,
     });
 
+    if (!updated) return next(new AppError("No such document exists", 404));
+
     res.status(201).json({
       status: "success",
       data: { updated },
@@ -45,6 +51,8 @@ exports.update = (model) => {
 exports.getOne = (model) => {
   return catchAsync(async (req, res, next) => {
     const doc = await model.findById(req.params.id);
+
+    if (!doc) return next(new AppError("No such document exists", 404));
 
     res.status(200).json({
       status: "success",

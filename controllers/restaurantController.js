@@ -1,7 +1,7 @@
 const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
-const factory = require("./factory");
-const restaurantModel = require("../models/restaurant");
+const factory = require("./factoryHandler");
+const restaurantModel = require("../models/restaurantModel");
 
 exports.postRestaurant = factory.create(restaurantModel);
 exports.updateRestaurant = factory.update(restaurantModel);

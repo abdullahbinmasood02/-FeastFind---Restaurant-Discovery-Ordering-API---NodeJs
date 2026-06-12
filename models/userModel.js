@@ -19,7 +19,7 @@ const userSchema = mongoose.Schema({
   role: {
     type: String,
     enum: ["customer", "owner", "delivery-agent", "admin"],
-    default: ["customer"],
+    default: "customer",
   },
   photo: {
     type: String,
@@ -58,14 +58,13 @@ const userSchema = mongoose.Schema({
 //pre middlewares
 
 //encrypt the password before storing to db
-userSchema.pre("save", function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
 
-  const hashedPassword = bcrypt.hash(this.password, 12);
+  const hashedPassword = await bcrypt.hash(this.password, 12);
   this.password = hashedPassword;
   this.passwordChangedAt = Date.now();
   this.passwordConfirm = undefined;
-  next();
 });
 
 //filter out inactive users
