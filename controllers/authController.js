@@ -3,6 +3,8 @@ const catchAsync = require("../utils/catchAsync");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 const { promisify } = require("util");
+const sendMail = require("../utils/Email");
+const crypto = require("crypto");
 
 function generateJwt(id, role) {
   const token = jwt.sign({ id, role }, process.env.JWT_SECRET, {
@@ -84,4 +86,71 @@ exports.protect = catchAsync(async (req, res, next) => {
   //if everything passes then add user to request  for future use and call next
   req.user = user;
   next();
+});
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  //verify credentials
+  const email = req?.body?.email;
+
+  if (!email) return next(new AppError("Email not provided", 400));
+
+  const user = await userModel.findOne({ email });
+
+  if (!user)
+    return next(new AppError("User with this email does not exist", 400));
+
+  const token = user.generatePasswordResetToken();
+
+  await user.save({ validateBeforeSave: false });
+
+  const resetUrl = `${req.protocol}://${req.get("host")}/api/v1/users/resetPassword/${token}`;
+
+  try {
+    await sendMail({
+      receiver: user.email,
+      subject: "Your Password Reset Token",
+      message: `forgot your password? Reset it through this link (valid for 10 mins): ${resetUrl}`,
+    });
+    res.status(201).json({
+      status: "success",
+      message: "Token sent to email",
+    });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save({ validateBeforeSave: false });
+    return next(
+      new AppError("Could not send reset token. Please try again later", 500),
+    );
+  }
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const token = req.params.token;
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  // check if user with this token exists and token is within valid time range
+  const user = await userModel.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+  if (!user)
+    return next(
+      new AppError("Token has expired or user does not exist with this token"),
+    );
+
+  //if token is valid then reset the password
+
+  const password = req.body.passwordNew;
+  const passwordConfirm = req.body.passwordConfirm;
+
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  sendResponse(user._id, user.role, 201, res);
 });

@@ -86,10 +86,10 @@ userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
 };
 
 userSchema.methods.generatePasswordResetToken = function () {
-  const token = crypto.randomBytes(32);
+  const token = crypto.randomBytes(32).toString("hex");
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
   this.passwordResetToken = hashedToken; //store hashed token in db
-  this.passwordResetExpires = Date.now() * 10 * 60 * 100; // expire token in 10mins
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000; // expire token in 10mins
   return token; //return the unencrypted token
 };
 
