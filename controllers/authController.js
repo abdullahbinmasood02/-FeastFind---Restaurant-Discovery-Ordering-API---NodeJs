@@ -1,0 +1,87 @@
+const AppError = require("../utils/AppError");
+const catchAsync = require("../utils/catchAsync");
+const jwt = require("jsonwebtoken");
+const userModel = require("../models/userModel");
+const { promisify } = require("util");
+
+function generateJwt(id, role) {
+  const token = jwt.sign({ id, role }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+  return token;
+}
+
+function sendResponse(id, role, statusCode, res) {
+  const token = generateJwt(id, role);
+
+  res.status(statusCode).json({
+    status: "success",
+    token,
+  });
+}
+
+exports.login = catchAsync(async (req, res, next) => {
+  const password = req.body.password;
+  const email = req.body.email;
+
+  const user = await userModel.findOne({ email }).select("+password");
+  //check if user exists and password provided is correct
+  if (!user || !(await user.isCorrectPassword(password)))
+    return next(new AppError("Email or password not correct", 400));
+
+  //if correct credentials, then generate token and send it as response
+  sendResponse(user._id, user.role, 201, res);
+});
+
+exports.signup = catchAsync(async (req, res, next) => {
+  const password = req.body.password;
+  const email = req.body.email;
+  const name = req.body.name;
+  const passwordConfirm = req.body.passwordConfirm;
+
+  const user = await userModel.create({
+    email,
+    password,
+    name,
+    passwordConfirm,
+  });
+
+  sendResponse(user._id, user.role, 201, res);
+});
+
+exports.restrictTo = function (...roles) {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role))
+      return next(new AppError("You are not authorized for this operation"));
+    next();
+  };
+};
+
+exports.protect = catchAsync(async (req, res, next) => {
+  //check token existence
+  const token = req.headers?.authorization?.split(" ")[1];
+
+  if (!token) return next(new AppError("Token not provided", 400));
+
+  //check token validity
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  if (!decoded)
+    return next(new AppError("invalid token. Please login again", 400));
+
+  //check if user still exists
+
+  const user = await userModel.findById(decoded.id);
+
+  if (!user)
+    return next(new AppError("User with this token no longer exists", 400));
+
+  //check if password was changed after token was sent
+
+  if (user.changedPasswordAfter(decoded.iat))
+    return next(new AppError("Password was changed. Please login again", 400));
+
+  //if everything passes then add user to request  for future use and call next
+  req.user = user;
+  next();
+});

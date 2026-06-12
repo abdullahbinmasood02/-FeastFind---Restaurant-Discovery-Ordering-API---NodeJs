@@ -46,6 +46,14 @@ function sendErrorProd(err, res) {
   }
 }
 
+function handleJwtError(err) {
+  return new AppError("Token is malformed. Please try again", 400);
+}
+
+function handleJwtExpiredError(err) {
+  return new AppError("Token has expired. Please login again", 400);
+}
+
 function globalErrorController(err, req, res, next) {
   err.status = err.status || "error";
   err.statusCode = err.statusCode || 500;
@@ -57,6 +65,9 @@ function globalErrorController(err, req, res, next) {
     if (err.name === "CastError") error = handleCastErrorDb(err);
     else if (err.name === "ValidationError") error = handleValErrorDb(err);
     else if (err.code === 11000) error = handleDuplicateErrorDb(err);
+    else if (err.name === "JsonWebTokenError") error = handleJwtError(err);
+    else if (err.name === "TokenExpiredError")
+      error = handleJwtExpiredError(err);
 
     sendErrorProd(error || err, res);
   }

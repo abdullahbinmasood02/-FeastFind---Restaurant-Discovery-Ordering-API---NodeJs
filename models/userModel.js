@@ -80,7 +80,9 @@ userSchema.methods.isCorrectPassword = async function (candidatePassword) {
 //method to check if password was changed after jwt was issued, returns true if yes
 userSchema.methods.changedPasswordAfter = function (jwtTimestamp) {
   const jwtMs = jwtTimestamp * 1000;
-  return this.passwordChangedAt.getTime() > jwtMs;
+  return this.passwordChangedAt
+    ? this.passwordChangedAt.getTime() > jwtMs
+    : false;
 };
 
 userSchema.methods.generatePasswordResetToken = function () {
