@@ -154,3 +154,23 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   sendResponse(user._id, user.role, 201, res);
 });
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const passwordCurrent = req.body.passwordCurrent;
+  const passwordNew = req.body.passwordNew;
+  const passwordConfirm = req.body.passwordConfirm;
+
+  if (!passwordCurrent || !passwordNew)
+    return next(new AppError("Enter both current and new password", 400));
+
+  const user = await userModel.findById(req.user._id).select("+password");
+
+  if (!user || !(await user.isCorrectPassword(passwordCurrent)))
+    return next(new AppError("Current password is not correct", 400));
+
+  user.password = passwordNew;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+
+  sendResponse(user._id, user.role, 201, res);
+});
