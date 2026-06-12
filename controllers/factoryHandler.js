@@ -4,7 +4,11 @@ const ApiFeatures = require("../utils/ApiFeatures");
 
 exports.getAll = (model) => {
   return catchAsync(async (req, res, next) => {
-    let query = model.find();
+    let filterStr = req.params.restaurantId
+      ? { restaurant: `${req.params.restaurantId}` }
+      : {};
+
+    let query = model.find(filterStr);
 
     const apiFeatures = new ApiFeatures(req.query, query);
 

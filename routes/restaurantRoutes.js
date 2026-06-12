@@ -1,7 +1,9 @@
 const restaurantController = require("../controllers/restaurantController");
 const express = require("express");
 const restaurantRouter = express.Router();
+const reviewRouter = require("./reviewRoutes");
 
+restaurantRouter.use("/:restaurantId/reviews", reviewRouter);
 restaurantRouter
   .route("/")
   .get(restaurantController.getAllRestaurants)
