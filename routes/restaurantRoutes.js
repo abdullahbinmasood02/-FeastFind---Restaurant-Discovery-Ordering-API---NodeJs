@@ -7,16 +7,25 @@ const authController = require("../controllers/authController");
 restaurantRouter.use("/:restaurantId/reviews", reviewRouter);
 restaurantRouter
   .route("/")
-  .get(
+  .get(restaurantController.getAllRestaurants)
+  .post(
     authController.protect,
+    authController.restrictTo("owner", "admin"),
+    restaurantController.postRestaurant,
+  );
 
-    restaurantController.getAllRestaurants,
-  )
-  .post(restaurantController.postRestaurant);
+restaurantRouter.use(authController.protect);
+
 restaurantRouter
   .route("/:id")
   .get(restaurantController.getRestaurant)
-  .delete(restaurantController.deleteRestaurant)
-  .patch(restaurantController.updateRestaurant);
+  .delete(
+    authController.restrictTo("admin"),
+    restaurantController.deleteRestaurant,
+  )
+  .patch(
+    authController.restrictTo("admin", "owner"),
+    restaurantController.updateRestaurant,
+  );
 
 module.exports = restaurantRouter;

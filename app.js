@@ -5,11 +5,27 @@ const globalErrorController = require("./controllers/ErrorController");
 const menuItemRouter = require("./routes/menuItemRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
 const AppError = require("./utils/AppError");
+const helmet = require("helmet");
+const rateLimiter = require("express-rate-limit");
+const sanitize = require("express-mongo-sanitize");
+const xssClean = require("xss-clean");
+const hpp = require("hpp");
 
 //startup configs
 const app = express();
 app.use(express.json());
 
+//security
+app.use(helmet());
+app.use(xssClean());
+app.use(sanitize());
+app.use(hpp(["ratingsAverage", "priceRange", "cuisine"]));
+const limiter = rateLimiter({
+  max: 100,
+  window: 60 * 60 * 1000,
+  message: "Too many requests. Please try again later.",
+});
+app.use("/api", limiter);
 //routers
 app.use("/api/v1/restaurants", restaurantRouter);
 app.use("/api/v1/users", userRouter);

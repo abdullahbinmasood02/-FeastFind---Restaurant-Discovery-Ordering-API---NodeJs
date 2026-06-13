@@ -7,18 +7,16 @@ userRouter.route("/signup").post(authController.signup);
 userRouter.route("/login").post(authController.login);
 userRouter.route("/forgotPassword").post(authController.forgotPassword);
 userRouter.route("/resetPassword/:token").post(authController.resetPassword);
-userRouter
-  .route("/updatePassword")
-  .post(authController.protect, authController.updatePassword);
 
-userRouter
-  .route("/updateMe")
-  .post(authController.protect, userController.updateMe);
+userRouter.use(authController.protect);
 
-userRouter
-  .route("/deleteMe")
-  .delete(authController.protect, userController.deleteMe);
+userRouter.route("/updatePassword").post(authController.updatePassword);
 
+userRouter.route("/updateMe").post(userController.updateMe);
+
+userRouter.route("/deleteMe").delete(userController.deleteMe);
+
+userRouter.use(authController.restrictTo("admin"));
 userRouter
   .route("/")
   .get(userController.getAllUsers)

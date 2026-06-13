@@ -1,6 +1,12 @@
 const menuItemController = require("../controllers/menuItemController");
 const express = require("express");
 const menuItemRouter = express.Router();
+const authController = require("../controller/authController");
+
+menuItemRouter.use(
+  authController.protect,
+  authController.restrictTo("owner", "admin"),
+);
 
 menuItemRouter
   .route("/")
