@@ -58,7 +58,7 @@ const restaurantSchema = mongoose.Schema(
     priceRange: {
       type: String,
       required: [true, "please enter price range"],
-      enum: ["budget", "moderate", "fine=dining"],
+      enum: ["budget", "moderate", "fine-dining"],
     },
     openingHours: {
       open: {
@@ -93,7 +93,7 @@ const restaurantSchema = mongoose.Schema(
     },
   },
   {
-    toJson: {
+    toJSON: {
       virtuals: true,
     },
     toObject: {

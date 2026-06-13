@@ -1,6 +1,12 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+
+//injecting env
+dotenv.config({
+  path: "./config.env",
+});
+
 const app = require("./app");
 
 //handling exceptions and unhandled promises
@@ -14,11 +20,6 @@ process.on("unhandledRejection", (err) => {
 process.on("uncaughtException", (err) => {
   console.log(err.name, err.message, err.stack);
   process.exit(1);
-});
-
-//injecting env
-dotenv.config({
-  path: "./config.env",
 });
 
 //connecting to mongoDB

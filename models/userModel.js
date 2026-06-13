@@ -7,7 +7,7 @@ const userSchema = mongoose.Schema({
   name: {
     type: String,
     minlength: [2, "name cannot be less than 2 characters"],
-    max: [30, "name cannot be more than 30 characterss"],
+    maxlength: [30, "name cannot be more than 30 characterss"],
     required: [true, "please enter your name"],
   },
   email: {
@@ -15,6 +15,7 @@ const userSchema = mongoose.Schema({
     required: [true, "please enter your email"],
     lowercase: true,
     validate: validator.isEmail,
+    unique: true,
   },
   role: {
     type: String,
@@ -63,7 +64,7 @@ userSchema.pre("save", async function () {
 
   const hashedPassword = await bcrypt.hash(this.password, 12);
   this.password = hashedPassword;
-  this.passwordChangedAt = Date.now();
+
   this.passwordConfirm = undefined;
 });
 

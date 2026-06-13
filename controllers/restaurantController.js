@@ -6,7 +6,7 @@ const restaurantModel = require("../models/restaurantModel");
 exports.postRestaurant = factory.create(restaurantModel);
 exports.updateRestaurant = factory.update(restaurantModel);
 exports.deleteRestaurant = factory.deleteOne(restaurantModel);
-exports.getRestaurant = factory.getOne(restaurantModel);
+exports.getRestaurant = factory.getOne(restaurantModel, { path: "reviews" });
 exports.getAllRestaurants = factory.getAll(restaurantModel);
 
 exports.restaurantsWithin = catchAsync(async (req, res, next) => {

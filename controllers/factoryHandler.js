@@ -52,9 +52,11 @@ exports.update = (model) => {
   });
 };
 
-exports.getOne = (model) => {
+exports.getOne = (model, options) => {
   return catchAsync(async (req, res, next) => {
-    const doc = await model.findById(req.params.id);
+    let query = model.findById(req.params.id);
+    if (options) query = query.populate(options);
+    const doc = await query;
 
     if (!doc) return next(new AppError("No such document exists", 404));
 

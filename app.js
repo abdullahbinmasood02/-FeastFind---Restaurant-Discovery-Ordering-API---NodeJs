@@ -19,10 +19,11 @@ app.use(express.json());
 app.use(helmet());
 app.use(xssClean());
 app.use(sanitize());
-app.use(hpp(["ratingsAverage", "priceRange", "cuisine"]));
+app.use(hpp({ whitelist: ["ratingsAverage", "priceRange", "cuisine"] }));
+//limit requests
 const limiter = rateLimiter({
   max: 100,
-  window: 60 * 60 * 1000,
+  windowMs: 60 * 60 * 1000,
   message: "Too many requests. Please try again later.",
 });
 app.use("/api", limiter);

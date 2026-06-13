@@ -7,7 +7,11 @@ reviewRouter.use(authController.protect);
 reviewRouter
   .route("/")
   .get(reviewController.getAllReviews)
-  .post(authController.restrictTo("customer"), reviewController.postReview);
+  .post(
+    reviewController.setParams,
+    authController.restrictTo("customer"),
+    reviewController.postReview,
+  );
 reviewRouter
   .route("/:id")
   .get(reviewController.getReview)
