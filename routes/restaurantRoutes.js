@@ -4,6 +4,12 @@ const restaurantRouter = express.Router();
 const reviewRouter = require("./reviewRoutes");
 const authController = require("../controllers/authController");
 
+restaurantRouter
+  .route("/within/:distance/center/:latlng/unit/:unit")
+  .get(restaurantController.restaurantsWithin);
+restaurantRouter
+  .route("/distances/:latlng/unit/:unit")
+  .get(restaurantController.restaurantsNear);
 restaurantRouter.use("/:restaurantId/reviews", reviewRouter);
 restaurantRouter
   .route("/")

@@ -28,6 +28,7 @@ function sendResponse(id, role, statusCode, res) {
 
   res.status(statusCode).json({
     status: "success",
+    ...(process.env.NODE_ENV === "dev" && { token }),
   });
 }
 

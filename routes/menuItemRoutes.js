@@ -1,7 +1,7 @@
 const menuItemController = require("../controllers/menuItemController");
 const express = require("express");
 const menuItemRouter = express.Router();
-const authController = require("../controller/authController");
+const authController = require("../controllers/authController");
 
 menuItemRouter.use(
   authController.protect,

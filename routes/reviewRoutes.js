@@ -1,8 +1,9 @@
 const reviewController = require("../controllers/reviewController");
 const express = require("express");
 const reviewRouter = express.Router({ mergeParams: true });
+const authController = require("../controllers/authController");
 
-app.use(authController.protect);
+reviewRouter.use(authController.protect);
 reviewRouter
   .route("/")
   .get(reviewController.getAllReviews)
