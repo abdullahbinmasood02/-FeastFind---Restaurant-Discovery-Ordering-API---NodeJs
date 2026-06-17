@@ -2,6 +2,63 @@ const AppError = require("../utils/AppError");
 const catchAsync = require("../utils/catchAsync");
 const factory = require("./factoryHandler");
 const restaurantModel = require("../models/restaurantModel");
+const multer = require("multer");
+const sharp = require("sharp");
+
+const multerStorage = multer.memoryStorage();
+const multerFilter = (req, file, cb) => {
+  if (!file.mimetype.startsWith("image"))
+    return cb(new AppError("File not an image", 400), false);
+  else cb(null, true);
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadRestaurantImages = upload.fields([
+  {
+    name: "imageCover",
+    max: 1,
+  },
+  {
+    name: "images",
+    max: 3,
+  },
+]);
+
+exports.processImages = catchAsync(async (req, res, next) => {
+  //cover image
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  req.body.coverImage = `restaurant-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat("jpeg")
+    .jpeg(90)
+    .toFile(`public/img/restaurants/${req.body.coverImage}`);
+
+  //other images
+  req.body.images = [];
+
+  await Promise.all(
+    req.files.images.map(async (image, index) => {
+      const filename = `restaurant-${req.params.id}-${Date.now()}-${index}.jpeg`;
+
+      await sharp(image.buffer)
+        .resize(2000, 1333)
+        .toFormat("jpeg")
+        .jpeg(90)
+        .toFile(`public/img/restaurants/${filename}`);
+
+      req.body.images.push(filename);
+    }),
+  );
+
+  next();
+});
 
 exports.postRestaurant = factory.create(restaurantModel);
 exports.updateRestaurant = factory.update(restaurantModel);

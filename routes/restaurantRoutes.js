@@ -30,7 +30,9 @@ restaurantRouter
     restaurantController.deleteRestaurant,
   )
   .patch(
-    authController.restrictTo("admin", "owner"),
+    // authController.restrictTo("admin", "owner"),
+    restaurantController.uploadRestaurantImages,
+    restaurantController.processImages,
     restaurantController.updateRestaurant,
   );
 
