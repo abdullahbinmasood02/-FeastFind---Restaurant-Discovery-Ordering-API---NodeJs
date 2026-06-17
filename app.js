@@ -15,6 +15,9 @@ const hpp = require("hpp");
 const app = express();
 app.use(express.json());
 
+//serve static files
+app.use(express.static(`${__dirname}/public`));
+
 //security
 app.use(helmet());
 app.use(xssClean());

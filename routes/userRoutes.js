@@ -10,12 +10,12 @@ userRouter.route("/resetPassword/:token").post(authController.resetPassword);
 
 userRouter.use(authController.protect);
 
-userRouter
-  .route("/getMe")
-  .get(authController.protect, userController.getMe, userController.getUser);
+userRouter.route("/getMe").get(userController.getMe, userController.getUser);
 userRouter.route("/updatePassword").post(authController.updatePassword);
 
-userRouter.route("/updateMe").post(userController.updateMe);
+userRouter
+  .route("/updateMe")
+  .post(userController.uploadUserPhoto, userController.updateMe);
 
 userRouter.route("/deleteMe").delete(userController.deleteMe);
 
