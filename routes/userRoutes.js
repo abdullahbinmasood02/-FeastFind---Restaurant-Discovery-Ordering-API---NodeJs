@@ -15,7 +15,11 @@ userRouter.route("/updatePassword").post(authController.updatePassword);
 
 userRouter
   .route("/updateMe")
-  .post(userController.uploadUserPhoto, userController.updateMe);
+  .post(
+    userController.uploadUserPhoto,
+    userController.processUserPhoto,
+    userController.updateMe,
+  );
 
 userRouter.route("/deleteMe").delete(userController.deleteMe);
 
