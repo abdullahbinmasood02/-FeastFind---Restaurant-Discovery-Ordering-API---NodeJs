@@ -4,7 +4,7 @@ const pug = require("pug");
 
 module.exports = class Email {
   constructor(user, url) {
-    this.from = `<Abdullah Bin Masood> ${process.env.NODE_ENV.EMAIL_FROM}`;
+    this.from = `Abdullah Bin Masood <${process.env.EMAIL_FROM}>`;
     this.url = url;
     this.to = user.email;
     this.firstName = user.name.split(" ")[0];
@@ -12,7 +12,13 @@ module.exports = class Email {
   //function to create the email transporter
   createNewTransporter() {
     if (process.env.NODE_ENV === "prod") {
-      return 1;
+      return nodemailer.createTransport({
+        service: "SendGrid",
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+          pass: process.env.SENDGRID_PASSWORD,
+        },
+      });
     }
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
