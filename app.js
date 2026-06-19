@@ -4,6 +4,7 @@ const userRouter = require("./routes/userRoutes");
 const globalErrorController = require("./controllers/ErrorController");
 const menuItemRouter = require("./routes/menuItemRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
+const bookingRouter = require("../routes/bookingRoutes");
 const AppError = require("./utils/AppError");
 const helmet = require("helmet");
 const rateLimiter = require("express-rate-limit");
@@ -35,6 +36,7 @@ app.use("/api/v1/restaurants", restaurantRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/menuItems", menuItemRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/bookings", bookingRouter);
 
 //invalid route handler
 app.all("*", function (req, res, next) {
